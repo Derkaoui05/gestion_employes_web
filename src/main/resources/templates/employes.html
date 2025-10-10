@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gestion des Employés</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        .bg-grid-pattern {
+            background-image: linear-gradient(rgba(0, 0, 0, 0.03) 1px, transparent 1px),
+            linear-gradient(90deg, rgba(0, 0, 0, 0.03) 1px, transparent 1px);
+            background-size: 50px 50px;
+        }
+    </style>
+</head>
+<body class="bg-gradient-to-br from-white via-sky-50 to-slate-100 min-h-screen">
+<div class="relative overflow-hidden min-h-screen">
+    <div class="absolute inset-0 bg-grid-pattern opacity-10"></div>
+
+    <div class="container mx-auto px-4 py-10 relative z-10 max-w-6xl">
+        <div class="mb-6">
+            <a th:href="@{/}" class="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-white text-slate-700 border border-slate-200 hover:bg-slate-50 transition-colors shadow-sm">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path>
+                </svg>
+                <span>Accueil</span>
+            </a>
+        </div>
+        <div class="text-center mb-10">
+            <h1 class="text-4xl md:text-5xl font-bold text-slate-900 tracking-tight">Gestion des Employés</h1>
+            <p class="text-slate-600 mt-2">Ajouter, modifier et supprimer des employés</p>
+        </div>
+
+        <!-- Formulaire d'ajout -->
+        <form th:action="@{/employes/add}" th:object="${employeForm}" method="post"
+              class="mb-8 bg-white rounded-2xl p-6 border border-slate-200 grid grid-cols-1 md:grid-cols-4 gap-4 shadow-sm">
+            <input type="text" th:field="*{cin}" placeholder="CIN" class="w-full p-3 rounded-lg bg-white border border-slate-200 text-slate-900 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500" required>
+            <input type="text" th:field="*{nom}" placeholder="Nom" class="w-full p-3 rounded-lg bg-white border border-slate-200 text-slate-900 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500" required>
+            <input type="text" th:field="*{prenom}" placeholder="Prénom" class="w-full p-3 rounded-lg bg-white border border-slate-200 text-slate-900 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500" required>
+            <div>
+                <input id="add-salaire" type="number" th:field="*{salaire}" placeholder="Salaire" class="w-full p-3 rounded-lg bg-white border border-slate-200 text-slate-900 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500" required>
+            </div>
+            <button type="submit" class="px-4 py-3 rounded-xl bg-gradient-to-br from-blue-500 to-blue-600 text-white font-semibold hover:scale-105 transition-transform duration-300 shadow-lg">Ajouter</button>
+        </form>
+
+        <!-- Liste des employés -->
+        <div class="bg-white rounded-2xl p-4 border border-slate-200 overflow-x-auto shadow-sm">
+            <table class="w-full table-auto">
+                <thead>
+                <tr class="text-left text-slate-600">
+                    <th class="px-4 py-3">CIN</th>
+                    <th class="px-4 py-3">Nom</th>
+                    <th class="px-4 py-3">Prénom</th>
+                    <th class="px-4 py-3">Salaire</th>
+                    <th class="px-4 py-3">Salaire Hebdo</th>
+                    <th class="px-4 py-3">Actions</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr th:each="e,iter : ${employes}" class="border-t border-slate-200">
+                    <form th:action="@{/employes/update}" method="post" class="contents">
+                        <td class="px-4 py-3">
+                            <input type="text" th:name="cin" th:value="${e.cin}" readonly
+                                   class="w-full p-2 rounded-lg bg-white border border-slate-200 text-slate-900">
+                        </td>
+                        <td class="px-4 py-3">
+                            <input type="text" th:name="nom" th:value="${e.nom}" class="w-full p-2 rounded-lg bg-white border border-slate-200 text-slate-900">
+                        </td>
+                        <td class="px-4 py-3">
+                            <input type="text" th:name="prenom" th:value="${e.prenom}" class="w-full p-2 rounded-lg bg-white border border-slate-200 text-slate-900">
+                        </td>
+                        <td class="px-4 py-3">
+                            <input type="number" class="row-salaire w-full p-2 rounded-lg bg-white border border-slate-200 text-slate-900" th:name="salaire" th:value="${e.salaire}" th:attr="data-index=${iter.index}" placeholder="Salaire">
+                        </td>
+                        <td class="px-4 py-3">
+                            <span class="weekly-preview" th:attr="data-index=${iter.index}" th:text="${e.salaire} != null ? ${e.salaire} / 7 : 0">0</span>
+                        </td>
+                        <td class="px-4 py-3">
+                            <div class="flex items-center gap-2">
+                                <button type="submit" onclick="sessionStorage.setItem('empAction','updated')" class="px-3 py-2 rounded-lg bg-green-600 text-white hover:bg-green-700 transition-colors">Modifier</button>
+                    </form>
+                    <form th:action="@{/employes/delete/{cin}(cin=${e.cin})}" method="post">
+                        <button type="submit" onclick="sessionStorage.setItem('empAction','deleted')" class="px-3 py-2 rounded-lg bg-red-600 text-white hover:bg-red-700 transition-colors">Supprimer</button>
+                    </form>
+                            </div>
+                        </td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<script>
+    (function() {
+        var action = sessionStorage.getItem('empAction');
+        if (!action) return;
+        sessionStorage.removeItem('empAction');
+
+        var message = action === 'updated' ? 'Employé modifié avec succès' : 'Employé supprimé avec succès';
+        var bgColor = action === 'updated' ? 'bg-emerald-500' : 'bg-rose-600';
+
+        var toast = document.createElement('div');
+        toast.className = 'fixed top-4 right-4 z-50';
+        toast.innerHTML = '\n            <div class="'+bgColor+' text-white px-4 py-3 rounded-xl shadow-2xl border border-white/20 backdrop-blur-sm flex items-center gap-2">\n                <span>'+message+'</span>\n            </div>\n        ';
+        document.body.appendChild(toast);
+
+        setTimeout(function(){
+            if (toast && toast.parentNode) {
+                toast.parentNode.removeChild(toast);
+            }
+        }, 3000);
+    })();
+
+    // Weekly preview: compute monthly/7 on the fly; do NOT modify submitted values
+    (function() {
+        var updateForms = document.querySelectorAll('form[action$="/employes/update"]');
+        updateForms.forEach(function(f){
+            var input = f.querySelector('input.row-salaire');
+            var idx = input ? input.getAttribute('data-index') : null;
+            var preview = idx ? document.querySelector('span.weekly-preview[data-index="'+idx+'"]') : null;
+
+            if (input && preview) {
+                var onInput = function(){
+                    var v = parseFloat(input.value || '0');
+                    if (isNaN(v)) v = 0;
+                    preview.textContent = (Math.round(((v/7) + Number.EPSILON) * 100) / 100).toString();
+                };
+                input.addEventListener('input', onInput);
+                onInput();
+            }
+        });
+    })();
+</script>
+
+</body>
+</html>

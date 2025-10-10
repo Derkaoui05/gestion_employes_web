@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="fr">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Avance / Absence</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+      .bg-grid-pattern {
+        background-image: linear-gradient(rgba(0, 0, 0, 0.03) 1px, transparent 1px),
+          linear-gradient(90deg, rgba(0, 0, 0, 0.03) 1px, transparent 1px);
+        background-size: 50px 50px;
+      }
+    </style>
+  </head>
+  <body class="bg-gradient-to-br from-white via-sky-50 to-slate-100 min-h-screen">
+    <div class="relative overflow-hidden min-h-screen flex items-center justify-center">
+      <div class="absolute inset-0 bg-grid-pattern opacity-10"></div>
+      <a
+        th:href="@{/}"
+        class="absolute top-6 left-6 inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-white text-slate-700 border border-slate-200 hover:bg-slate-50 transition-colors shadow-sm"
+      >
+        <svg
+          class="w-5 h-5"
+          fill="none"
+          stroke="currentColor"
+          viewBox="0 0 24 24"
+          xmlns="http://www.w3.org/2000/svg"
+        >
+          <path
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            stroke-width="2"
+            d="M10 19l-7-7m0 0l7-7m-7 7h18"
+          ></path>
+        </svg>
+        <span>Accueil</span>
+      </a>
+
+      <div
+        class="relative z-10 w-full max-w-lg bg-white rounded-2xl p-8 border border-slate-200 mx-4 shadow-sm"
+      >
+        <h1 class="text-3xl font-bold text-slate-900 mb-6 text-center">
+          Ajouter Avance ou Absence
+        </h1>
+
+        <form th:action="@{/avance-absence/add}" method="post" class="space-y-4">
+          <!-- Sélection de l'employé -->
+          <select
+            name="employeCin"
+            class="w-full p-3 rounded-lg bg-white border border-slate-200 text-slate-900 focus:outline-none focus:ring-2 focus:ring-blue-500"
+            required
+          >
+            <option value="">-- Sélectionner un employé --</option>
+            <option
+              th:each="e : ${employes}"
+              th:value="${e.cin}"
+              th:text="${e.nom}+' - '+${e.prenom}"
+            ></option>
+          </select>
+
+          <!-- Type : Avance ou Absence -->
+          <select
+            name="type"
+            class="w-full p-3 rounded-lg bg-white border border-slate-200 text-slate-900 focus:outline-none focus:ring-2 focus:ring-blue-500"
+            required
+          >
+            <option value="">-- Sélectionner le type --</option>
+            <option value="avance">Avance</option>
+            <option value="absence">Absence</option>
+          </select>
+
+          <!-- Montant -->
+          <input
+            type="number"
+            name="montant"
+            placeholder="Montant (DH)"
+            min="0"
+            class="w-full p-3 rounded-lg bg-white border border-slate-200 text-slate-900 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500"
+            required
+          />
+
+          <!-- Date -->
+          <input
+            type="date"
+            name="date"
+            class="w-full p-3 rounded-lg bg-white border border-slate-200 text-slate-900 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500"
+            required
+          />
+
+          <!-- Submit -->
+          <button
+            type="submit"
+            class="w-full py-3 rounded-xl bg-gradient-to-br from-blue-500 to-blue-600 text-white font-semibold hover:scale-105 transition-transform duration-300 shadow-lg"
+          >
+            Enregistrer
+          </button>
+        </form>
+      </div>
+    </div>
+  </body>
+</html>
